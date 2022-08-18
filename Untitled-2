@@ -1,0 +1,240 @@
+<!--
+-->
+
+
+<?php
+include 'config.php';
+//error_reporting(0);
+   $cphone=$_GET['cid'];
+            $sql="SELECT `order`.pname,`order`.sphone,`order`.quantity,`order`.total,`costumer`.cname,`costumer`.caddress,`costumer`.cemail,`costumer`.cphone FROM `order`,`costumer` WHERE `order`.cphone=`costumer`.cphone";
+
+            $result=mysqli_query($conn,$sql);
+            $num=mysqli_num_rows($result);
+            if($num>=0){
+                while( $row=mysqli_fetch_assoc($result)){
+                        $pname=$row['pname'];
+                        $sphone=$row['sphone'];
+                        $quantity=$row['quantity'];
+                        $total=$row['total'];
+                        $cname=$row['cname'];    
+                        $caddress=$row['caddress'];
+                        $cemail=$row['cemail'];
+                        $cphone=$row['cphone'];
+                    
+                        if(isset($_POST['confirmed'])){  
+                            $pname=$row['pname'];
+                            $quantity=$row['quantity'];
+                            $total=$row['total'];
+                            $cname=$row['cname'];
+                            $caddress=$row['caddress'];
+                            $cemail=$row['cemail'];
+                            $cphone=$row['cphone'];
+                            $sphone=$row['sphone'];
+                            
+                            $sql="INSERT INTO `ordertable` (`pname`, `quantity`, `total`, `cname`, `caddress`, `cemail`,`cphone`,`sphone`,`status`) VALUES ('$pname','$quantity', '$total', '$cname', '$caddress', '$cemail','$cphone','$sphone','pending')";
+                            $result=mysqli_query($conn,$sql);
+                            
+                            if($result){
+                                $pname=$row['pname'];
+                                $sql ="DELETE FROM `order` WHERE pname='$pname'";
+                                $result=mysqli_query($conn,$sql);
+                                if($result){   
+                                    
+                                    echo ("<script LANGUAGE='JavaScript'>
+                                    window.alert('Order Successful');
+                                    window.location.href='cart.php';
+                                    </script>");
+                                }
+                            
+                            }else{
+                                echo "<script>alert('Something went wrong.')</script>";
+                            }
+                            }
+                    
+                        }
+            }
+                
+    
+    ?>
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Review Cart Iteam</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+      <div class="navbar">
+       <div class="logo">
+           <a href="index.php"><img src="images/logo.png" width ="125px"></a>
+       </div>
+       <nav>
+           <ul>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="product.php">Products</a></li>
+                <li><a href="aboutus.php">About</a></li>        
+                <li><a href="contact.php">Contact</a></li>
+           </ul>
+       </nav>
+       <a href="cart.php"><img src="images/cart.png" width="30px" height="30px"></a>
+   </div>
+  </div> 
+<!-----------------------------cart------------------------------>
+<div class="small-container cart-page">
+   <h2>Your Selected Products:</h2>
+    <table>
+        <tr>
+            <th>Product</th>
+            <th>Quantity(In kg)</th>
+            <th>Total</th>
+        </tr>
+        
+        
+        <tbody>
+           <?php
+            $sq="SELECT order.cphone,order.pname,order.quantity,order.price,order.total,product.picture FROM `order`,`product` WHERE product.pname=order.pname";
+            $result=mysqli_query($conn,$sq);
+            $num=mysqli_num_rows($result);
+            if($num>0){
+                while( $row=mysqli_fetch_assoc($result)){
+                    $cphone=$row['cphone'];
+                    $pname=$row['pname'];
+                    $price=$row['price'];
+                    $quantity=$row['quantity'];
+                    $picture=$row['picture'];
+                    $total=$row['total'];
+                    
+                    echo '  <tr>
+            <td><div class="cartinfo">
+             <img src="images/'. $picture.'">
+            <div>
+                <p>'.$pname.'</p>
+                <small>Price: Rs. '.$price.'</small>
+            </div>
+        </div></td>
+        <td>'.$quantity.' kg</td>
+        <td>Rs. '.$total.'</td>
+        </tr>';
+                }
+            }
+    
+    ?>
+        
+       </tbody>
+       
+        
+        
+        
+        
+        
+        
+        
+        
+        
+<!--
+        <tr>
+            <td><div class="cartinfo">
+            <img src="images/brokauli.jpg">
+            <div>
+                <p>Brokauli</p>
+                <small>Price:Rs 80.00</small>
+                <br>
+                <a href="">Remove</a>
+            </div>
+        </div></td>
+        <td><input type="number" value="1"></td>
+        <td>Rs 80.00</td>
+        </tr>
+         <tr>
+            <td><div class="cartinfo">
+            <img src="images/onion.jpg">
+            <div>
+                <p>Onion</p>
+                <small>Price:Rs 60.00</small>
+                <br>
+                <a href="">Remove</a>
+            </div>
+        </div></td>
+        <td><input type="number" value="2"></td>
+        <td>Rs 120.00</td>
+        </tr>
+-->
+    </table>
+    <div class="total-price">
+        <table>
+<!--
+            <tr>
+                <td>Subtotal</td>
+                <td>Rs 200.00</td>
+            </tr>
+            <tr>
+                <td>Discount</td>
+                <td>Rs 50.00</td>
+            </tr>
+-->
+            <tr>
+               
+                <td>Total</td>
+                <td><?php
+                     $sql="SELECT SUM(total) AS summ FROM `order`";
+                    $result=mysqli_query($conn,$sql);
+                    while ($row =mysqli_fetch_assoc($result)){
+                        echo 'Rs. '.$row['summ'].'';
+                        
+                    }
+                    
+        
+                 ?>   
+                    </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>
+                    
+                     <form action="" method="post">
+                            <button name="confirmed" type="submit" class="btn">Confirm</button>
+                        </form>
+                       </td>                
+                
+            </tr>
+        
+        </table>
+    </div>
+</div>
+
+
+
+
+
+<!------------------------------------footer-------------------------------->
+<div class="footer">
+    <div class="container">
+        <div class="row">
+
+            <div class="footer-col">
+                <h3>Follow Us On</h3>
+                <ul>
+                    <li>
+                        <a href=""><img src="https://img.icons8.com/fluent/50/000000/facebook-new.png"/></a>
+                    </li>
+                    <li>
+                        <a href=""><img src="https://img.icons8.com/fluent/48/000000/instagram-new.png"/></a>
+                    </li>
+                    <li>
+                        <a href=""><img src="https://img.icons8.com/fluent/48/000000/twitter.png"/></a>
+                    </li>
+                </ul>
+            </div>
+        </div> 
+    </div>
+     <div class="copyright"><p>All rights reserved.</p></div>
+</div> 
+</body>
+</html>
